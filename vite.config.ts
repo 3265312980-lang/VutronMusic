@@ -160,6 +160,10 @@ export default defineConfig(({ mode }) => {
           target: `http://127.0.0.1:40001`,
           changeOrigin: true
         },
+        '/kugou': {
+          target: `http://127.0.0.1:40001`,
+          changeOrigin: true
+        },
         '/local-asset': {
           target: `http://127.0.0.1:40001`,
           changeOrigin: true

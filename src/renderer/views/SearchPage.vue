@@ -153,9 +153,21 @@ const loadData = async (reset = true) => {
     const loggedInStreams = services.value
       .filter((s) => s.type === 'stream' && s.status === 'login')
       .map((s) => s.code)
-    if (loggedInStreams.length > 0) {
+    if (currentPlugin === STREAM_SENTINEL) {
       targets = loggedInStreams
+    } else if (loggedInStreams.includes(currentPlugin as PluginId)) {
+      targets = [currentPlugin]
+    } else {
+      targets = []
     }
+  }
+
+  // 没有可搜索的目标时直接返回空结果
+  if (targets.length === 0) {
+    if (reset) {
+      searchResult[currentTab][currentPlugin] = { data: [], count: 0, sourceContext: {} }
+    }
+    return
   }
 
   // 重置所有目标槽位

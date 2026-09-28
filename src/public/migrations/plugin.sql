@@ -132,8 +132,8 @@ CREATE TABLE IF NOT EXISTS "Plugins" (
 );
 
 INSERT OR IGNORE INTO Plugins (id, name, type, builtIn) VALUES ('local', '本地音乐', 'local', 1);
-INSERT OR IGNORE INTO Plugins (id, name, type, builtIn) VALUES ('kugou', '酷狗音乐', 'stream', 1);
 INSERT OR IGNORE INTO Plugins (id, name, type, builtIn) VALUES ('netease', '网易云音乐', 'library', 1);
+INSERT OR IGNORE INTO Plugins (id, name, type, builtIn) VALUES ('kugou', '酷狗音乐', 'library', 1);
 INSERT OR IGNORE INTO Plugins (id, name, type, builtIn) VALUES ('emby', 'Emby', 'stream', 1);
 INSERT OR IGNORE INTO Plugins (id, name, type, builtIn) VALUES ('jellyfin', 'Jellyfin', 'stream', 1);
 INSERT OR IGNORE INTO Plugins (id, name, type, builtIn) VALUES ('navidrome', 'Navidrome', 'stream', 1);

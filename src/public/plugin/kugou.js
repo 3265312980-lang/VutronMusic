@@ -174,7 +174,7 @@ const apis = api
 
 const user = { userId: 0, isVip: false, token: '' }
 let dfid = ''
-let baseUrl = ''
+let baseUrl = 'http://127.0.0.1:40001/kugou'
 const collectedPlaylists = { ids: [] }
 const collectedArtists = { ids: [] }
 const artistLists = { status: 0, data: {} }
@@ -219,7 +219,7 @@ const updateVip = () => {
 apis.store
   .get('')
   .then(async (store) => {
-    baseUrl = store.baseUrl || ''
+    if (store.baseUrl) baseUrl = store.baseUrl
 
     if (!baseUrl) return
 
@@ -469,6 +469,12 @@ const formatTrack = (item, size = 64, artistId = null) => {
       .replace('{size}', `${size}`)
       .replace('http://', 'https://')
 
+    const duration =
+      item.timelen ??
+      item.timelength ??
+      item.duration ??
+      (item.time_length ?? item.Duration ?? 0) * 1000
+
     return {
       id: item.songid ?? item.audio_id ?? item.id ?? item.Audioid ?? '',
       name:
@@ -478,11 +484,7 @@ const formatTrack = (item, size = 64, artistId = null) => {
         item.name?.split('-')[1]?.trim() ??
         item.name ??
         '',
-      duration:
-        item.timelen ??
-        item.timelength ??
-        item.duration ??
-        (item.time_length ?? item.Duration ?? 0) * 1000,
+      duration,
       alias: [],
       createTime:
         parseDate(
@@ -509,6 +511,7 @@ const formatTrack = (item, size = 64, artistId = null) => {
           item.name ??
           '',
         hash: item.hash || item.FileHash || '',
+        duration,
         album: { id: album.id, name: album.name },
         artists: artists.map((it) => ({ id: it.id, name: it.name })),
         picUrl,
@@ -2082,52 +2085,41 @@ exports.resizePicUrl = (params) => {
 exports.getTrackDetail = async (params) => {
   try {
     const sources = params.tracks
-    const size = sources.length === 1 ? '512' : '256'
-    const hash = sources.map((item) => item.hash).join(',')
-    const result = await get('privilege/lite', { hash })
-
-    if (result.status === 1) {
-      const data = result.data.map((item, idx) => {
-        const { album, artists: _ar, picUrl: image } = sources[idx]
-
-        const res = isTrackPlayable(item)
-        const picUrl =
-          item.info?.image?.replace('{size}', size) || image.replace(/\/\d+\//, `/512/`)
-
-        const artists = _ar.map((it) => ({
-          ...it,
-          picUrl: '',
+    const data = sources.map((sc) => {
+      const artists = (sc.artists || []).map((ar) => ({
+        id: ar.id || '',
+        name: ar.name || '',
+        picUrl: '',
+        pluginId: '',
+        sourceContext: { id: ar.id || '' }
+      }))
+      return {
+        id: sc.id || '',
+        name: sc.name || '',
+        duration: sc.duration || 0,
+        alias: [],
+        createTime: 0,
+        no: 0,
+        playable: true,
+        reason: '',
+        mvid: 0,
+        playCount: 0,
+        album: {
+          id: sc.album?.id || '',
+          name: sc.album?.name || '',
+          picUrl: sc.picUrl || '',
           pluginId: '',
-          sourceContext: { id: it.id }
-        }))
-        return {
-          id: item.id ?? '',
-          name: item.name?.split('-')[1]?.trim() ?? item.name ?? '',
-          duration: item.info.duration || 0,
-          alias: [],
-          createTime: 0,
-          no: 0,
-          playable: res.playable,
-          reason: res.reason,
-          mvid: 0,
-          playCount: 0,
-          album: {
-            ...album,
-            picUrl,
-            pluginId: '',
-            sourceContext: { id: album.id }
-          },
-          artists,
-          albumArtists: artists,
-          picUrl,
-          pluginId: '',
-          type: meta.type,
-          sourceContext: sources[idx]
-        }
-      })
-      return { code: 200, data }
-    }
-    return { code: 200, data: [] }
+          sourceContext: { id: sc.album?.id || '' }
+        },
+        artists,
+        albumArtists: artists,
+        picUrl: sc.picUrl || '',
+        pluginId: '',
+        type: meta.type,
+        sourceContext: sc
+      }
+    })
+    return { code: 200, data }
   } catch {
     return { code: 404, data: [] }
   }

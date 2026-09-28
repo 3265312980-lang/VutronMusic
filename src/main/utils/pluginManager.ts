@@ -250,6 +250,12 @@ export class PluginInstance {
     let target: URL
     try {
       target = new URL(rawUrl)
+
+      // 允许访问本地服务器（应用内置 API）
+      if (target.hostname === '127.0.0.1' || target.hostname === 'localhost') {
+        return true
+      }
+
       const allowedUrl = new URL(allowedDomains)
 
       return (

@@ -18,6 +18,7 @@ import { MprisImpl } from './mpris'
 import fastify, { FastifyInstance } from 'fastify'
 import fastifyCookie from '@fastify/cookie'
 import netease from './appServer/netease'
+import kugou from './appServer/kugou'
 import httpHandler from './appServer/httpHandler'
 import { startInstance as startAmuseFastifyInstance } from './appServer/6kLabsAmuse'
 import IPCs from './IPCs'
@@ -162,6 +163,7 @@ class BackGround {
     await generateConfig()
 
     server.register(netease)
+    server.register(kugou)
     server.register(httpHandler)
     server.decorate('win', null)
 

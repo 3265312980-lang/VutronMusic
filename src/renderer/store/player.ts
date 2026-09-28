@@ -392,6 +392,13 @@ export const usePlayerStore = defineStore(
         track: JSON.parse(JSON.stringify(currentTrack.value))
       })) ?? { url: [], replayGain: 0, peak: 1 }
 
+      // VIP / 付费歌曲拿不到播放地址，友好提示而不是报错
+      if (!songUrlResult.url || songUrlResult.url.length === 0) {
+        playing.value = false
+        stateStore.showToast('VIP歌曲无法播放')
+        return
+      }
+
       engineStore.playAudioSource(
         songUrlResult.url,
         songUrlResult.replayGain,
